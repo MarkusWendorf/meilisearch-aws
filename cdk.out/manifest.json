@@ -1,0 +1,142 @@
+{
+  "version": "16.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "TestMeiliStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "TestMeiliStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "TestMeiliStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "TestMeiliStack.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ece7f1ca5f0b13d51e6dffec630558d2e140ff9c2df9cd22e75e82a2306b0323.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "TestMeiliStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "TestMeiliStack.assets"
+      ],
+      "metadata": {
+        "/TestMeiliStack/Lambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaServiceRoleA8ED4D3B"
+          }
+        ],
+        "/TestMeiliStack/Lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaD247545B"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPI1CC12F26"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPICloudWatchRole025FE33D"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIAccountB5481627"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIDeploymentD35A5380617a79b813b9375038a5e4d5c5722046"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIDeploymentStageprod21CF62B9"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIEndpointB14C3C54"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Default/{proxy+}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIproxy75878BA9"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Default/{proxy+}/ANY/ApiPermission.TestMeiliStackRestAPI8D19623E.ANY..{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIproxyANYApiPermissionTestMeiliStackRestAPI8D19623EANYproxyF0D4EA7C"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Default/{proxy+}/ANY/ApiPermission.Test.TestMeiliStackRestAPI8D19623E.ANY..{proxy+}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIproxyANYApiPermissionTestTestMeiliStackRestAPI8D19623EANYproxy6370A93A"
+          }
+        ],
+        "/TestMeiliStack/RestAPI/Default/{proxy+}/ANY/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestAPIproxyANYFF0AF03D"
+          }
+        ],
+        "/TestMeiliStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/TestMeiliStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/TestMeiliStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/TestMeiliStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "TestMeiliStack"
+    }
+  }
+}

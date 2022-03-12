@@ -1,0 +1,569 @@
+{
+  "Resources": {
+    "LambdaServiceRoleA8ED4D3B": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/Lambda/ServiceRole/Resource"
+      }
+    },
+    "LambdaD247545B": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ImageUri": {
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:7e6ce335597d7fac3089f475c2bcb98f9c5536882bb605c38c0fd53a4d440711"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaServiceRoleA8ED4D3B",
+            "Arn"
+          ]
+        },
+        "PackageType": "Image"
+      },
+      "DependsOn": [
+        "LambdaServiceRoleA8ED4D3B"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/Lambda/Resource",
+        "aws:asset:path": "asset.7e6ce335597d7fac3089f475c2bcb98f9c5536882bb605c38c0fd53a4d440711",
+        "aws:asset:dockerfile-path": "Dockerfile",
+        "aws:asset:property": "Code.ImageUri"
+      }
+    },
+    "RestAPI1CC12F26": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "RestAPI"
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Resource"
+      }
+    },
+    "RestAPICloudWatchRole025FE33D": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/CloudWatchRole/Resource"
+      }
+    },
+    "RestAPIAccountB5481627": {
+      "Type": "AWS::ApiGateway::Account",
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "RestAPICloudWatchRole025FE33D",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "RestAPI1CC12F26"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Account"
+      }
+    },
+    "RestAPIDeploymentD35A5380617a79b813b9375038a5e4d5c5722046": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestAPI1CC12F26"
+        },
+        "Description": "Automatically created by the RestApi construct"
+      },
+      "DependsOn": [
+        "RestAPIproxyANYFF0AF03D",
+        "RestAPIproxy75878BA9"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Deployment/Resource"
+      }
+    },
+    "RestAPIDeploymentStageprod21CF62B9": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestAPI1CC12F26"
+        },
+        "DeploymentId": {
+          "Ref": "RestAPIDeploymentD35A5380617a79b813b9375038a5e4d5c5722046"
+        },
+        "StageName": "prod"
+      },
+      "DependsOn": [
+        "RestAPIAccountB5481627"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/DeploymentStage.prod/Resource"
+      }
+    },
+    "RestAPIproxy75878BA9": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "RestAPI1CC12F26",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": {
+          "Ref": "RestAPI1CC12F26"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Default/{proxy+}/Resource"
+      }
+    },
+    "RestAPIproxyANYApiPermissionTestMeiliStackRestAPI8D19623EANYproxyF0D4EA7C": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaD247545B",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "RestAPI1CC12F26"
+              },
+              "/",
+              {
+                "Ref": "RestAPIDeploymentStageprod21CF62B9"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Default/{proxy+}/ANY/ApiPermission.TestMeiliStackRestAPI8D19623E.ANY..{proxy+}"
+      }
+    },
+    "RestAPIproxyANYApiPermissionTestTestMeiliStackRestAPI8D19623EANYproxy6370A93A": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaD247545B",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "RestAPI1CC12F26"
+              },
+              "/test-invoke-stage/*/*"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Default/{proxy+}/ANY/ApiPermission.Test.TestMeiliStackRestAPI8D19623E.ANY..{proxy+}"
+      }
+    },
+    "RestAPIproxyANYFF0AF03D": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "ANY",
+        "ResourceId": {
+          "Ref": "RestAPIproxy75878BA9"
+        },
+        "RestApiId": {
+          "Ref": "RestAPI1CC12F26"
+        },
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "LambdaD247545B",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/RestAPI/Default/{proxy+}/ANY/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQ0U7DMAxFv2XvWaAg8V42IfGAQOUDJi81xWsTV7HLVFX9d5IWRHny8bV8de07WzzY2x1cZe/qdt/R2U7vCq41STpNHfhzDXY6smsxPnto8GkITomDOXyELb9h9CSSutkQeDtV3GEe5DobdPEEIqhiN2ZlVvLMVtizkHIcH0HQQE8NKF5hTEYoWva0eP1h6RwPQc0R+45HjwmTuunSGc0SYIW0ykN0uNj/Nj+eK7+gfnKdpZXm2Sz58j6FJg9eB+0H/beV+MChJl0uD1yjvcjNV3prcW+L3UWI9jEFJY+2Wus3RKrLf3UBAAA="
+      },
+      "Metadata": {
+        "aws:cdk:path": "TestMeiliStack/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Outputs": {
+    "RestAPIEndpointB14C3C54": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "RestAPI1CC12F26"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/",
+            {
+              "Ref": "RestAPIDeploymentStageprod21CF62B9"
+            },
+            "/"
+          ]
+        ]
+      }
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "af-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}
